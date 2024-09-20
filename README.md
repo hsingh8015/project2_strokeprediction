@@ -29,7 +29,9 @@ License
 
 
 Installation 
-    Provide a step-by-step description of how to get the development environment set and running.  
+    Provide a step-by-step description of how to get the development environment set and running. 
+    ![Items_to_import](https://github.com/user-attachments/assets/45735578-4342-4887-b5c8-b4114684978b)
+
 
 Usage
 
