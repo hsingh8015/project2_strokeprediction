@@ -18,7 +18,6 @@ with cols2:
     heart_disease = st.selectbox("Heart Disease", options=['No', 'Yes'])
     avg_glucose_level = st.number_input("Average Glucose Level", min_value=0, max_value=500, value=100, step=1)
 
-# Inputs for categorical variables
 with cols3:
     bmi = st.number_input("BMI", min_value=0, max_value=100, value=20, step=1)
     gender = st.selectbox("Gender", options=['Female', 'Male', 'Other'])
@@ -64,12 +63,18 @@ data = {
 # Convert to DataFrame
 input_df = pd.DataFrame([data])
 
-# Load the trained model
-model = pickle.load(open('rf.sav', 'rb'))
+# Load the scaler and the trained model
+scaler = pickle.load(open('scaler.pkl', 'rb'))  # Assuming the scaler is saved as 'scaler.pkl'
+model = pickle.load(open('gbc.sav', 'rb'))
+
+# Scale the input data
+input_scaled = scaler.transform(input_df)
 
 st.write("")
 if st.button('Predict Stroke'):
   
-    predictions = model.predict(input_df)
+    predictions = model.predict(input_scaled)
     if predictions[0] == 1:
-        st.write('Stroke Predicti
+        st.write('Stroke Prediction: Positive')
+    else:
+        st.write('Stroke Prediction: Negative')
