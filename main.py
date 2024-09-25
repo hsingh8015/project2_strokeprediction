@@ -8,6 +8,10 @@ st.title('Stroke Prediction Application')
 
 st.divider()
 
+# Model selection
+model_type = st.selectbox("Select Model", options=["Gradient Boosting Classifier", "Logistic Regression"])
+
+# Input fields
 cols1, cols2, cols3, cols4, cols5 = st.columns(5)
 
 with cols1:
@@ -33,12 +37,20 @@ with cols5:
 # Mapping for categorical features to numeric
 gender_mapping = {'Female': [1, 0, 0], 'Male': [0, 1, 0], 'Other': [0, 0, 1]}
 ever_married_mapping = {'No': [1, 0], 'Yes': [0, 1]}
-work_type_mapping = {'Govt_job': [1, 0, 0, 0, 0], 'Never_worked': [0, 1, 0, 0, 0], 
-                     'Private': [0, 0, 1, 0, 0], 'Self-employed': [0, 0, 0, 1, 0], 
-                     'children': [0, 0, 0, 0, 1]}
+work_type_mapping = {
+    'Govt_job': [1, 0, 0, 0, 0], 
+    'Never_worked': [0, 1, 0, 0, 0], 
+    'Private': [0, 0, 1, 0, 0], 
+    'Self-employed': [0, 0, 0, 1, 0], 
+    'children': [0, 0, 0, 0, 1]
+}
 residence_type_mapping = {'Rural': [1, 0], 'Urban': [0, 1]}
-smoking_status_mapping = {'Unknown': [1, 0, 0, 0], 'formerly smoked': [0, 1, 0, 0], 
-                          'never smoked': [0, 0, 1, 0], 'smokes': [0, 0, 0, 1]}
+smoking_status_mapping = {
+    'Unknown': [1, 0, 0, 0], 
+    'formerly smoked': [0, 1, 0, 0], 
+    'never smoked': [0, 0, 1, 0], 
+    'smokes': [0, 0, 0, 1]
+}
 
 # Convert Yes/No to 1/0 for binary categories
 hypertension_value = 1 if hypertension == 'Yes' else 0
@@ -64,17 +76,29 @@ data = {
 input_df = pd.DataFrame([data])
 
 # Load the scaler and the trained model
-scaler = pickle.load(open('scaler.pkl', 'rb'))  # Assuming the scaler is saved as 'scaler.pkl'
-model = pickle.load(open('gbc.sav', 'rb'))
+# Load the scaler
+with open('scaler.pkl', 'rb') as n:
+    scaler = pickle.load(n)  # Load the scaler
+
+# Load the appropriate model based on selection
+if model_type == "Gradient Boosting Classifier":
+    with open('gbc.sav', 'rb') as f:
+        model = pickle.load(f)  # Load the GBC model
+else:
+    with open('reg_model.sav', 'rb') as r:
+        model = pickle.load(r)  # Load the Logistic Regression model
 
 # Scale the input data
 input_scaled = scaler.transform(input_df)
 
 st.write("")
-if st.button('Predict Stroke'):
-  
+if st.button('Predict Stroke Risk'):
+    probabilities = model.predict_proba(input_scaled)
     predictions = model.predict(input_scaled)
+    
+    st.write(f"Predicted probabilities: {probabilities}")
+    
     if predictions[0] == 1:
-        st.write('Stroke Prediction: Positive')
+        st.write('Risk of stroke: Positive')
     else:
-        st.write('Stroke Prediction: Negative')
+        st.write('Risk of stroke: Negative')
