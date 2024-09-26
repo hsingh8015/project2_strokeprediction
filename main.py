@@ -35,22 +35,89 @@ with cols5:
     smoking_status = st.selectbox("Smoking Status", options=['Unknown', 'formerly smoked', 'never smoked', 'smokes'])
 
 # Mapping for categorical features to numeric
-gender_mapping = {'Female': [1, 0, 0], 'Male': [0, 1, 0], 'Other': [0, 0, 1]}
-ever_married_mapping = {'No': [1, 0], 'Yes': [0, 1]}
-work_type_mapping = {
-    'Govt_job': [1, 0, 0, 0, 0], 
-    'Never_worked': [0, 1, 0, 0, 0], 
-    'Private': [0, 0, 1, 0, 0], 
-    'Self-employed': [0, 0, 0, 1, 0], 
-    'children': [0, 0, 0, 0, 1]
-}
-residence_type_mapping = {'Rural': [1, 0], 'Urban': [0, 1]}
-smoking_status_mapping = {
-    'Unknown': [1, 0, 0, 0], 
-    'formerly smoked': [0, 1, 0, 0], 
-    'never smoked': [0, 0, 1, 0], 
-    'smokes': [0, 0, 0, 1]
-}
+# Gender mapping
+if gender == 'Female':
+    gender_Female = 1
+    gender_Male = 0
+    gender_Other = 0
+elif gender == 'Male':
+    gender_Female = 0
+    gender_Male = 1
+    gender_Other = 0
+else:
+    gender_Female = 0
+    gender_Male = 0
+    gender_Other = 1
+
+# Ever married mapping
+if ever_married == 'No':
+    ever_married_No = 1
+    ever_married_Yes = 0
+else:
+    ever_married_Yes = 1
+    ever_married_No = 0
+
+# Work type mapping
+if work_type == 'Govt_job':
+    work_type_Govt_job = 1
+    work_type_Never_worked = 0
+    work_type_Private = 0
+    work_type_Self_employed = 0
+    work_type_children = 0
+elif work_type == 'Never_worked':
+    work_type_Govt_job = 0
+    work_type_Never_worked = 1
+    work_type_Private = 0
+    work_type_Self_employed = 0
+    work_type_children = 0
+elif work_type == 'Private':
+    work_type_Govt_job = 0
+    work_type_Never_worked = 0
+    work_type_Private = 1
+    work_type_Self_employed = 0
+    work_type_children = 0
+elif work_type == 'Self-employed':
+    work_type_Govt_job = 0
+    work_type_Never_worked = 0
+    work_type_Private = 0
+    work_type_Self_employed = 1
+    work_type_children = 0
+else:
+    work_type_Govt_job = 0
+    work_type_Never_worked = 0
+    work_type_Private = 0
+    work_type_Self_employed = 0
+    work_type_children = 1
+
+# Residence type mapping
+if residence_type == 'Rural':
+    Residence_type_Rural = 1
+    Residence_type_Urban = 0
+else:
+    Residence_type_Rural = 0
+    Residence_type_Urban = 1
+
+# Smoking status mapping
+if smoking_status == 'Unknown':
+    smoking_status_Unknown = 1
+    smoking_status_formerly_smoked = 0
+    smoking_status_never_smoked = 0
+    smoking_status_smokes = 0
+elif smoking_status == 'formerly smoked':
+    smoking_status_Unknown = 0
+    smoking_status_formerly_smoked = 1
+    smoking_status_never_smoked = 0
+    smoking_status_smokes = 0
+elif smoking_status == 'never smoked':
+    smoking_status_Unknown = 0
+    smoking_status_formerly_smoked = 0
+    smoking_status_never_smoked = 1
+    smoking_status_smokes = 0
+else:
+    smoking_status_Unknown = 0
+    smoking_status_formerly_smoked = 0
+    smoking_status_never_smoked = 0
+    smoking_status_smokes = 1
 
 # Convert Yes/No to 1/0 for binary categories
 hypertension_value = 1 if hypertension == 'Yes' else 0
@@ -63,22 +130,33 @@ data = {
     'heart_disease': heart_disease_value,
     'avg_glucose_level': avg_glucose_level,
     'bmi': bmi,
-    **dict(zip(['gender_Female', 'gender_Male', 'gender_Other'], gender_mapping[gender])),
-    **dict(zip(['ever_married_No', 'ever_married_Yes'], ever_married_mapping[ever_married])),
-    **dict(zip(['work_type_Govt_job', 'work_type_Never_worked', 'work_type_Private', 
-                'work_type_Self-employed', 'work_type_children'], work_type_mapping[work_type])),
-    **dict(zip(['Residence_type_Rural', 'Residence_type_Urban'], residence_type_mapping[residence_type])),
-    **dict(zip(['smoking_status_Unknown', 'smoking_status_formerly smoked', 
-                'smoking_status_never smoked', 'smoking_status_smokes'], smoking_status_mapping[smoking_status])),
+    'gender_Female': gender_Female,
+    'gender_Male': gender_Male,
+    'gender_Other': gender_Other,
+    'ever_married_No': ever_married_No,
+    'ever_married_Yes': ever_married_Yes,
+    'work_type_Govt_job': work_type_Govt_job,
+    'work_type_Never_worked': work_type_Never_worked,
+    'work_type_Private': work_type_Private,
+    'work_type_Self_employed': work_type_Self_employed,
+    'work_type_children': work_type_children,
+    'Residence_type_Rural': Residence_type_Rural,
+    'Residence_type_Urban': Residence_type_Urban,
+    'smoking_status_Unknown': smoking_status_Unknown,
+    'smoking_status_formerly_smoked': smoking_status_formerly_smoked,
+    'smoking_status_never_smoked': smoking_status_never_smoked,
+    'smoking_status_smokes': smoking_status_smokes
 }
 
 # Convert to DataFrame
 input_df = pd.DataFrame([data])
+input_df = input_df.iloc[0].tolist()
+input_df = [input_df]
 
 # Load the scaler and the trained model
 # Load the scaler
 with open('scaler.pkl', 'rb') as n:
-    scaler = pickle.load(n)  # Load the scaler
+    scaler = pickle.load(n)  
 
 # Load the appropriate model based on selection
 if model_type == "Gradient Boosting Classifier":
@@ -88,8 +166,21 @@ else:
     with open('reg_model.sav', 'rb') as r:
         model = pickle.load(r)  # Load the Logistic Regression model
 
-# Scale the input data
+## This is to  make sure every feature is in order.
+# # print(data)
+# print(input_df)
+# feature_names = ['age', 'hypertension', 'heart_disease', 'avg_glucose_level', 'bmi',
+#                  'gender_Female', 'gender_Male', 'gender_Other', 'ever_married_No',
+#                  'ever_married_Yes', 'work_type_Govt_job', 'work_type_Never_worked',
+#                  'work_type_Private', 'work_type_Self-employed', 'work_type_children',
+#                  'Residence_type_Rural', 'Residence_type_Urban', 'smoking_status_Unknown',
+#                  'smoking_status_formerly smoked', 'smoking_status_never smoked', 'smoking_status_smokes']
+# # Scale the input data
 input_scaled = scaler.transform(input_df)
+# print(input_scaled)
+# scaled_df = pd.DataFrame(input_scaled, columns=feature_names)
+# # Print the scaled values along with the corresponding feature names
+# print(scaled_df)
 
 st.write("")
 if st.button('Predict Stroke Risk'):
